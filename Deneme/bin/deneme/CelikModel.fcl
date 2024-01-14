@@ -1,0 +1,73 @@
+// Sakarya Üniversitesi Bilgisayar Mühendisliği Bölümü
+// 2023-2024 Öğretim Yılı Bulanık Mantık ve Yapay Sinir Ağların Giriş Dersi 1. Ödev
+// ilayda YILMAZ B201210057 1A Grubu
+
+FUNCTION_BLOCK CelikModel
+VAR_INPUT
+	sogumaHiz:REAL;
+	sudaBekletilmeSure: REAL;
+
+END_VAR
+VAR_OUTPUT
+	sertlik:REAL;
+END_VAR
+
+FUZZIFY sogumaHiz
+	TERM yavas:= trian 30 45 60;
+	TERM orta:= trape 50 60 80 100;
+	TERM hizli:= trape 90 100 110 120;
+	TERM cokHizli:= (120,0) (150,1);
+	
+END_FUZZIFY
+	
+FUZZIFY sudaBekletilmeSure
+	TERM cokKisa:= trian 600 900 1800;
+	TERM kisa:= trian 1800 2700 3600;
+	TERM orta:= trape 3200 3600 15000 18000;
+	TERM uzun:= trape 16000 27000 27000 36000;
+	
+END_FUZZIFY
+
+DEFUZZIFY sertlik
+	TERM bukulebilir:= trian 0 150 300;
+	TERM hafifSertlik :=trian 300 347 394;
+	TERM ortaSertlik:= trape 380 394 420 439;
+	TERM sert := trape 430 445 450 467;
+	TERM cokSert:= trian 450 480 505 ;
+	TERM asiriSert:= trape 485 505 750 750 ;
+	METHOD : COG;
+	
+		
+END_DEFUZZIFY
+
+RULEBLOCK kuralBlok1
+	
+		AND : MIN; 
+		ACT: MIN;  
+		ACCU: MAX;
+		
+		
+		RULE 1:IF sogumaHiz IS yavas AND sudaBekletilmeSure IS cokKisa THEN sertlik IS bukulebilir;
+		RULE 2:IF sogumaHiz IS yavas AND sudaBekletilmeSure IS kisa THEN sertlik IS hafifSertlik;
+		RULE 3:IF sogumaHiz IS yavas AND sudaBekletilmeSure IS orta THEN sertlik IS ortaSertlik;
+		RULE 4:IF sogumaHiz IS yavas AND sudaBekletilmeSure IS uzun THEN sertlik IS sert;
+		
+		RULE 5:IF sogumaHiz IS orta AND sudaBekletilmeSure IS cokKisa THEN sertlik IS hafifSertlik;
+		RULE 6:IF sogumaHiz IS orta AND sudaBekletilmeSure IS kisa THEN sertlik IS ortaSertlik;
+		RULE 7:IF sogumaHiz IS orta AND sudaBekletilmeSure IS orta THEN sertlik IS sert;
+		RULE 8:IF sogumaHiz IS orta AND sudaBekletilmeSure IS uzun THEN sertlik IS cokSert;
+		
+		RULE 9:IF sogumaHiz IS hizli AND sudaBekletilmeSure IS cokKisa THEN sertlik IS ortaSertlik;
+		RULE 10:IF sogumaHiz IS hizli AND sudaBekletilmeSure IS kisa THEN sertlik IS sert;
+		RULE 11:IF sogumaHiz IS hizli AND sudaBekletilmeSure IS orta THEN sertlik IS cokSert;
+		RULE 12:IF sogumaHiz IS hizli AND sudaBekletilmeSure IS uzun THEN sertlik IS asiriSert;
+		
+		RULE 13:IF sogumaHiz IS cokHizli AND sudaBekletilmeSure IS cokKisa THEN sertlik IS ortaSertlik;
+		RULE 14:IF sogumaHiz IS cokHizli AND sudaBekletilmeSure IS kisa THEN sertlik IS sert;
+		RULE 15:IF sogumaHiz IS cokHizli AND sudaBekletilmeSure IS orta THEN sertlik IS cokSert;
+		RULE 16:IF sogumaHiz IS cokHizli AND sudaBekletilmeSure IS uzun THEN sertlik IS asiriSert;
+	
+		
+	END_RULEBLOCK
+
+END_FUNCTION_BLOCK
